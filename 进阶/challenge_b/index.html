@@ -1,0 +1,11 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>系统失效诊断 · 离线样机</title>
+<style>body{max-width:960px;margin:32px auto;font:16px system-ui;padding:0 16px}button,select{padding:8px;margin:6px}pre{white-space:pre-wrap;background:#f2f5f8;padding:18px}small{color:#555}</style>
+<h1>系统失效诊断</h1><p>合成材料与固定响应离线重放；没有模型API调用。</p>
+<select id="cases"></select><label><input type="checkbox" id="reset">运行前清空状态</label><button id="run">运行所选案例</button>
+<p><small>观察请求顺序如何影响输出。R01→R02请保持状态；其他独立案例可勾选清空。候选人需完善差异、来源与验证状态展示。</small></p>
+<pre id="out">等待执行</pre>
+<script>
+const el=document.getElementById('cases'),out=document.getElementById('out');
+fetch('/api/cases').then(r=>r.json()).then(d=>d.cases.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.id+' · '+c.request.doc_ids.join(',')+' / '+c.request.snapshot+' · '+c.request.query;el.append(o)})).catch(e=>out.textContent=String(e));
+document.getElementById('run').onclick=async()=>{try{const r=await fetch('/api/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({case_id:el.value,reset:document.getElementById('reset').checked})});out.textContent=JSON.stringify(await r.json(),null,2)}catch(e){out.textContent=String(e)}};
+</script></html>
