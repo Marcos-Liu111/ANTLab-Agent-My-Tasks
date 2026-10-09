@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "run_id": "c5160d3c-7493-449b-9996-358317515a20",
+  "utc": "2026-10-09T09:25:42.836704+00:00",
+  "case_id": "T07",
+  "split": "evaluation",
+  "condition": "K",
+  "variant": "baseline",
+  "mode": "paid",
+  "config": {
+    "provider": "aixforge",
+    "model": "glm-5.3",
+    "endpoint": "https://api.aixforge.com/v1/chat/completions",
+    "parameters": {
+      "temperature": 0.0,
+      "max_tokens": 1024
+    },
+    "timeout_seconds": 120
+  },
+  "data_sha256": "c37cda40ada89a18630dd7be098672f7e942e6f57e6199fe1aa2d6046e2b4961",
+  "dataset_version": "basic-context-v1.2",
+  "student_sha256": "3342525eaad1563d55740a6a38c9ae3b029388e9f3e082345a900d36872364b7",
+  "original_passage_ids": [
+    "P313278",
+    "P802784"
+  ],
+  "selected_passage_ids": [
+    "P313278",
+    "P802784"
+  ],
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是一个文档核验助手。你的任务是从给定的资料段落中找到能精确回答问题的证据。\n\n## 匹配规则（必须逐字段核对，不能只看关键词相似）\n\n问题中通常包含这些定位字段，必须在段落中全部精确匹配后才能作为证据：\n- 项目名称（如：澄石项目 vs 岫光项目）\n- 版本号（如：R3 vs R4）\n- 月份/时间窗口（如：2026-03 vs 2026-02）\n- 批次类型与代号（如：正式回归批次CS41 vs 迁移批次XQ50 vs 探索组 vs 压力组）\n- 指标口径（如：支持率 vs 核验率；分母是有效问题数还是返回成功数）\n\n任何一个字段不匹配，该段落就不能作为答案依据（即使数字很接近）。\n\n## 回答规则\n\n1. 只依据给定段落作答，禁止使用外部知识或凭空推断。\n2. 可以跨段落组合证据（例如分子在一段、分母在另一段），此时每一段都要列入引用。\n3. 需要计算时，先在心里明确分子分母来自哪个段落，再给出结果。\n4. 如果所有段落中都找不到字段完全匹配的记录，回答\"证据不足\"，\n   并把最接近但不满足条件的段落ID列入 citations（表示你检查过这些来源）。\n5. 答案要简短：按题目要求的格式输出（百分数、数值、简短词组等）。\n6. 引用的每个段落ID必须真实出现在本次输入中，禁止编造ID。\n\n## 输出格式\n\n只输出一个JSON对象，不要输出任何其他文字：\n\n{\"answer\": \"简短答案\", \"citations\": [\"段落ID1\", \"段落ID2\"]}\n\n注意：\n- answer 是字符串\n- citations 是字符串数组，即使只有一个证据也要用数组\n- 证据不足时 answer 为 \"证据不足\"\n"
+    },
+    {
+      "role": "user",
+      "content": "## 问题\n按知秋项目R5版本2026-08资源表的决策规则，应选择哪项方案？只输出方案名称。\n\n## 资料段落（共2段）\n\n[段落1] ID: P313278 | 来源: 模拟记录/T07/页1\n知秋项目R5版本在2026-08的记录：资源表ZQ58记录甲完整支持84%、P50为6.1秒、2次调用；乙87%、7.4秒、3次；丙86%、6.8秒、2次。 选择表由产品与质量人员共同签署，先检查资格条件，再比较剩余方案。若部分输入在第一次执行时失败，表格仍保留该行。后续的修复记录引用原行号，避免把测试后的改善写回初次结果。 本页还记录版本升级后的回滚入口、会话恢复尝试和文档区域映射状态。摘要用于快速浏览，正式决定仍依据签署规则及原始检查项。只有项目、版本、窗口、批次一致的记录才能放在一次决策中比较。 本组清单由两名核对员独立抽读，意见不一致的项目保留两份初判和仲裁日期。机器生成的建议只在旁列展示，正式签署使用可定位原文、计算口径和原始执行记录。 每周核对本页行号、资料版本与签署记录。\n\n[段落2] ID: P802784 | 来源: 模拟记录/T07/页2\n知秋项目R5版本在2026-08的迁移批次XQ60处理相近题目；该批次统计80项输入，64项得到支持，候选流程耗时为5.9秒，快照S19完成初步定位。 登记系统保存字段定义和计算口径；百分比的分子分母都能追到清单行。数据在导出前经过一次格式检查，但格式检查通过并不意味着引文语义正确。人员复核与机器状态同时留在记录中。 资料表还登记文档快照、问题清单、检索候选数与人工反馈。检查员把格式错误、拒答和引用错误分列，遇到版本切换时重新核对实际使用的文档标识。一个批次的中位数不用于推断另一批次的首字延迟。 同一资料在多个视图中使用时，系统保留共同文档编号和各自页面位置。跨页引用由原始片段与映射关系组成；页面预览属于呈现数据，不能替代经过复核的文本内容。 每周核对本页行号、资料版本与签署记录。\n\n请根据以上段落回答问题，严格输出JSON。"
+    }
+  ],
+  "input_characters": 1572,
+  "status": "ok",
+  "elapsed_seconds": 4.789474199991673,
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "logprobs": null,
+        "message": {
+          "content": "{\"answer\": \"证据不足\", \"citations\": [\"P313278\", \"P802784\"]}",
+          "provider_metadata": {
+            "deepseek": {
+              "choiceIndex": 0,
+              "messageRole": "assistant",
+              "promptCacheHitTokens": 896,
+              "promptCacheMissTokens": 178,
+              "responseObject": "chat.completion",
+              "systemFingerprint": "aeb56401ca74e127821c4f9126dcb669"
+            },
+            "gateway": {
+              "cost": "0.000512376",
+              "gatewayCost": "0.000512376",
+              "generationId": "gen_01M4FZQ5ER0RM3GQ9WHCSHXSZH",
+              "inferenceCost": "0.000512376",
+              "inputInferenceCost": "0.000058776",
+              "marketCost": "0.000512376",
+              "outputInferenceCost": "0.0004536",
+              "routing": {
+                "affinity": {
+                  "outcome": "confirmed",
+                  "pinnedProvider": "deepseek"
+                },
+                "canonicalSlug": "deepseek/deepseek-v4.1-flash",
+                "clientSessionId": "sess-f2a8a0c8b4f97d47b4d1a84b9f169eca",
+                "clientSessionIdSource": "explicit",
+                "fallbacksAvailable": [
+                  "fireworks",
+                  "baseten",
+                  "alibaba",
+                  "runware",
+                  "particle",
+                  "novita",
+                  "togetherai",
+                  "deepinfra",
+                  "wafer",
+                  "parasail",
+                  "gmicloud",
+                  "modal",
+                  "morph",
+                  "runinfra",
+                  "boundless",
+                  "inference-net",
+                  "relace"
+                ],
+                "finalProvider": "deepseek",
+                "modelAttemptCount": 1,
+                "modelAttempts": [
+                  {
+                    "canonicalSlug": "deepseek/deepseek-v4.1-flash",
+                    "providerAttemptCount": 1,
+                    "providerAttempts": [
+                      {
+                        "credentialType": "system",
+                        "endTime": 1791537946640,
+                        "providerRequestId": "93f3b00ee415f16b78d794e7c4725292",
+                        "providerResponseId": "ca6ac7c3-02c1-40ea-a661-75bc5e287902",
+                        "startTime": 1791537944040,
+                        "statusCode": 200,
+                        "success": true
+                      }
+                    ],
+                    "success": true
+                  }
+                ],
+                "originalModelId": "deepseek/deepseek-v4.1-flash",
+                "planningReasoning": "System credentials planned for: deepseek, fireworks, baseten, alibaba, runware, particle, novita, togetherai, deepinfra, wafer, parasail, gmicloud, modal, morph, runinfra, boundless, inference-net, relace. Total execution order: deepseek(system) → fireworks(system) → baseten(system) → alibaba(system) → runware(system) → particle(system) → novita(system) → togetherai(system) → deepinfra(system) → wafer(system) → parasail(system) → gmicloud(system) → modal(system) → morph(system) → runinfra(system) → boundless(system) → inference-net(system) → relace(system)",
+                "resolvedProvider": "deepseek",
+                "totalProviderAttemptCount": 1
+              },
+              "surchargeCost": "0"
+            }
+          },
+          "role": "assistant"
+        }
+      }
+    ],
+    "created": 1791537946,
+    "generationId": "gen_01M4FZQ5ER0RM3GQ9WHCSHXSZH",
+    "id": "gen_01M4FZQ5ER0RM3GQ9WHCSHXSZH",
+    "model": "glm-5.3",
+    "object": "chat.completion",
+    "system_fingerprint": "fp_ynei4gcvxq",
+    "usage": {
+      "cache_creation_input_tokens": 0,
+      "completion_tokens": 378,
+      "completion_tokens_details": {
+        "image_tokens": 0,
+        "reasoning_tokens": 355
+      },
+      "gateway_cost": 0.000512376,
+      "market_cost": 0.000512376,
+      "prompt_tokens": 1074,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 896,
+        "video_tokens": 0
+      },
+      "total_tokens": 1452
+    }
+  },
+  "usage": {
+    "cache_creation_input_tokens": 0,
+    "completion_tokens": 378,
+    "completion_tokens_details": {
+      "image_tokens": 0,
+      "reasoning_tokens": 355
+    },
+    "gateway_cost": 0.000512376,
+    "market_cost": 0.000512376,
+    "prompt_tokens": 1074,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 896,
+      "video_tokens": 0
+    },
+    "total_tokens": 1452
+  },
+  "http_status": 200
+}
