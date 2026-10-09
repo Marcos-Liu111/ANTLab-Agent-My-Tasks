@@ -8,11 +8,8 @@ sys.path.insert(0, str(REPO / "基础" / "starter"))
 import runner  # noqa: E402
 
 CONFIG = str(REPO / "基础" / "config.local.json")
-JOBS = [  # (case, condition, variant)
-    ("D01", "R0", "improved"),
-    ("D02", "R0", "improved"),
-    ("D03", "R0", "improved"),
-    ("D04", "R0", "improved"),
+JOBS = [  # (case, condition, variant) — 正式配对：评测集 R0 improved x8
+    (f"T{i:02d}", "R0", "improved") for i in range(1, 9)
 ]
 MAX_TRY = 3
 
