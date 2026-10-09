@@ -1,0 +1,11 @@
+{
+  "provider": "aixforge",
+  "model": "glm-5.3",
+  "endpoint": "<REDACTED: see config.local.json locally>",
+  "parameters": {
+    "temperature": 0.0,
+    "max_tokens": 1024
+  },
+  "timeout_seconds": 120,
+  "notes": "模型与生成参数在全部主请求中保持统一；temperature=0 用于可复现。与真实密钥、私人 Endpoint 分离存放。"
+}
