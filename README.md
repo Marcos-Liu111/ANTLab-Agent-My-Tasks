@@ -10,7 +10,7 @@
 - **候选人**：刘福鹏
 - **所选方向**：基础题（文档核验） + 进阶 B（系统失效诊断 / 源码审查、故障归因与修复）
 - **最终提交分支**：`main`
-- **当前 Commit SHA**：`fae30d0b0c3cfeaee8cc7859c685d8736cf6b11e`
+- **最终 Commit SHA**：`11e41ac1403185f38ba04ab6eb3acab1800d1af2`（收集表填报以此为准）
 - **仓库地址**：`git@github.com:Marcos-Liu111/ANTLab-Agent-My-Tasks.git`
 
 ---
