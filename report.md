@@ -1,7 +1,7 @@
 # 基础与进阶整合报告
 
 **候选人姓名**：刘福鹏　**报名编号**：〈收集表统一填报〉　**进阶选择**：B（源码审查、故障归因与修复）
-**代码版本**：分支 `main`（Commit SHA: `d8a80a0b06311bccf08f96cf5c700d81035f88c6`）
+**代码版本**：分支 `main`（Commit SHA: `fae30d0b0c3cfeaee8cc7859c685d8736cf6b11e`）
 **数据/配置hash**：见 `configs/run_config.json` 与各 run 记录内 `data_sha256` / `student_sha256`
 
 > 说明：本报告为基础题与进阶B题共用的一份整合报告。所有数字均可由 `tools/` 下脚本复算；
