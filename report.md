@@ -1,7 +1,8 @@
 # 基础与进阶整合报告
 
-**报名编号**：　〈待填〉　**进阶选择**：B（源码审查、故障归因与修复）
-**代码版本**：`<待填：最终commit SHA>`　**数据/配置hash**：见 `configs/run_config.json` 与各 run 记录内 `data_sha256` / `student_sha256`
+**候选人姓名**：刘福鹏　**报名编号**：〈收集表统一填报〉　**进阶选择**：B（源码审查、故障归因与修复）
+**代码版本**：分支 `main`（Commit SHA: `d8a80a0b06311bccf08f96cf5c700d81035f88c6`）
+**数据/配置hash**：见 `configs/run_config.json` 与各 run 记录内 `data_sha256` / `student_sha256`
 
 > 说明：本报告为基础题与进阶B题共用的一份整合报告。所有数字均可由 `tools/` 下脚本复算；
 > 每条结论均指向具体 run ID 或原文位置。AI 使用情况统一见 `declaration.md`（文末索引）。
@@ -12,18 +13,18 @@
 
 | 要求 | 已实现 | 已运行 | 未验证/失败 | 证据路径 |
 |---|---|---|---|---|
-| 基础：`student.py` 请求链 | ✅ `prepare_messages` 四元组匹配 + JSON 契约 | ✅ D01–D04 开发题 4/4 | — | `基础/starter/student.py`、`基础/runs/` |
-| 基础：40 次主请求 | ✅ 32 基线（T01–T08×R0/R1/R2/K）+ 8 改进（R0） | ✅ 40/40 首次尝试成功 | 技术失败 0（1 次网络中断经续跑恢复，未计入分母） | `基础/runs/`（40 条 evaluation paid 记录） |
-| 基础：逐题核对 | ✅ 8 题×4 条件人工判定 | ✅ 24 条全文条件 23 正确 / 1 错误 | K 条件 7 题"无法确定"（证据缺失） | `results/verdict_per_case.md`、`results/verdict_summary.md` |
-| 基础：一次诊断 | ✅ T08/R0 顺序异常 | ✅ H1/H2 区分（离线） | R0 失败是确定还是概率，未重复统计 | `results/baseline_analysis.md` §3 |
-| 基础：改进+变体 | ✅ A+B 组合（分层重排+批次冲突规则） | ✅ 8 对配对：23/24→24/24 | — | `results/improved_pairing.md` |
-| 基础：三项决定 | ✅ 决策1~3 | ✅ | — | `decisions.md` |
-| 进阶B：故障复现 | ✅ R02 旧结论（主）+ R03/R04/R07 | ✅ 修复前基线 7 案 | — | `results/b/baseline.json` |
-| 进阶B：预测先于干预 | ✅ H1/H2 各写可观察预测 | ✅ | — | `results/b/b_predictions.md` |
-| 进阶B：最小修复 | ✅ `fixed_engine.py`（保留 Engine 接口） | ✅ 4 症状修复、3 案回归零变化 | 语义核验为轻量规则，泛化未验证 | `进阶/challenge_b/fixed_engine.py` |
-| 进阶B：回归/变体/边界 | ✅ R01/R05/R06 + V1/V2 + B1 | ✅ 全部 PASS | B1 为"明确登记的未解决边界" | `results/b/regression_variants.json` |
-| 进阶B：页面展示 | ✅ 请求/快照/证据/验证来源/修复前后 + 已核验与未核验区分 | ✅ E2E R01→R02 PASS | — | `进阶/challenge_b/index.html`、`server.py` |
-| 整合报告 | ✅ 本文件 | — | — | `report.md` |
+| 基础：`student.py` 请求链 | 已实现（四元组匹配 + JSON 契约） | 已运行（D01–D04 开发题 4/4） | — | `基础/starter/student.py`、`基础/runs/` |
+| 基础：40 次主请求 | 已实现（32 基线 + 8 改进） | 已运行（40/40 首次尝试成功） | 技术失败 0（1 次网络中断经续跑恢复，未计入分母） | `基础/runs/`（40 条 evaluation paid 记录） |
+| 基础：逐题核对 | 已实现（8 题×4 条件人工判定） | 已运行（24 条全文条件 23 正确 / 1 错误） | K 条件 7 题"无法确定"（证据缺失） | `results/verdict_per_case.md`、`results/verdict_summary.md` |
+| 基础：一次诊断 | 已实现（T08/R0 顺序异常） | 已运行（H1/H2 区分，离线） | R0 失败是确定还是概率，未重复统计 | `results/baseline_analysis.md` §3 |
+| 基础：改进+变体 | 已实现（A+B 组合：分层重排+批次冲突规则） | 已运行（8 对配对：23/24→24/24） | — | `results/improved_pairing.md` |
+| 基础：三项决定 | 已实现（决策1~3） | 已运行 | — | `decisions.md` |
+| 进阶B：故障复现 | 已实现（R02 旧结论（主）+ R03/R04/R07） | 已运行（修复前基线 7 案） | — | `results/b/baseline.json` |
+| 进阶B：预测先于干预 | 已实现（H1/H2 各写可观察预测） | 已运行 | — | `results/b/b_predictions.md` |
+| 进阶B：最小修复 | 已实现（`fixed_engine.py` 保留 Engine 接口） | 已运行（4 症状修复、3 案回归零变化） | 语义核验为轻量规则，泛化未验证 | `进阶/challenge_b/fixed_engine.py` |
+| 进阶B：回归/变体/边界 | 已实现（R01/R05/R06 + V1/V2 + B1） | 已运行（全部 PASS） | B1 为"明确登记的未解决边界" | `results/b/regression_variants.json` |
+| 进阶B：页面展示 | 已实现（请求/快照/证据/验证来源/修复前后 + 状态区分） | 已运行（E2E R01→R02 PASS） | — | `进阶/challenge_b/index.html`、`server.py` |
+| 整合报告 | 已实现（本文件） | — | — | `report.md` |
 
 **最重要的结论（限定适用范围）**
 
@@ -152,7 +153,7 @@ D01–D04 上调试并通过 4/4 后冻结（commit `e221120`），随后运行 
 | 任务ID | 基线 | 改进 | 人工依据 | 失败/覆盖 | 原始记录 |
 |---|---|---|---|---|---|
 | T01–T07 | 正确 | 正确（持平） | `verdict_per_case.md` | 无变化（天花板效应，如实报告） | 7×2 条 |
-| T08 | ❌ 证据不足 | ✅ K17 | 原文页3（K17 三项通过）+ 页7（规则要求三项全通过） | 引用同时由 3 段收敛为 2 段（不再引用陷阱段 P436140） | 2 条 |
+| T08 | 未通过 证据不足 | 通过 K17 | 原文页3（K17 三项通过）+ 页7（规则要求三项全通过） | 引用同时由 3 段收敛为 2 段（不再引用陷阱段 P436140） | 2 条 |
 
 **汇总**：23/24 → **24/24**，零回退。复算：`python tools/run_jobs.py`（已跑则跳过）。
 
