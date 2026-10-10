@@ -1,11 +1,137 @@
-<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>系统失效诊断 · 离线样机</title>
-<style>body{max-width:960px;margin:32px auto;font:16px system-ui;padding:0 16px}button,select{padding:8px;margin:6px}pre{white-space:pre-wrap;background:#f2f5f8;padding:18px}small{color:#555}</style>
-<h1>系统失效诊断</h1><p>合成材料与固定响应离线重放；没有模型API调用。</p>
-<select id="cases"></select><label><input type="checkbox" id="reset">运行前清空状态</label><button id="run">运行所选案例</button>
-<p><small>观察请求顺序如何影响输出。R01→R02请保持状态；其他独立案例可勾选清空。候选人需完善差异、来源与验证状态展示。</small></p>
-<pre id="out">等待执行</pre>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>系统失效诊断 · 离线样机（修复前后对照）</title>
+<style>
+  body{max-width:1180px;margin:24px auto;font:15px system-ui;padding:0 16px;color:#1b2733}
+  h1{font-size:22px} h2{font-size:17px;margin:18px 0 6px}
+  .ctl{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0}
+  button,select,input{padding:7px 10px;font-size:14px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .card{border:1px solid #ccd6e0;border-radius:8px;padding:12px 14px;background:#fbfdff}
+  .card.base{border-color:#e0b4b4;background:#fff8f8}
+  .card.fix{border-color:#a9d5b4;background:#f6fff8}
+  .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:12px;margin-right:6px;color:#fff}
+  .b-ok{background:#2e9e5b} .b-bad{background:#c94f4f} .b-warn{background:#c58b1d}
+  .b-gray{background:#7a8694} .b-blue{background:#3d7dbf}
+  .muted{color:#66778a;font-size:13px}
+  pre{white-space:pre-wrap;background:#f2f5f8;padding:10px;border-radius:6px;font-size:13px;max-height:280px;overflow:auto}
+  .diff{background:#fff3bf;padding:1px 3px;border-radius:3px}
+  table{border-collapse:collapse;width:100%;font-size:13px;margin-top:6px}
+  td,th{border:1px solid #d7dfe8;padding:5px 7px;text-align:left;vertical-align:top}
+  th{background:#eef3f8}
+  .verified{border-left:4px solid #2e9e5b} .unverified{border-left:4px solid #7a8694}
+  .invalid{border-left:4px solid #c94f4f} .unsupported{border-left:4px solid #c58b1d}
+</style>
+</head>
+<body>
+<h1>系统失效诊断 · 离线样机（修复前后对照）</h1>
+<p class="muted">合成材料与固定响应离线重放；没有模型API调用。展示当前请求、来源快照、实际证据、验证来源与修复前后行为。</p>
+
+<div class="ctl">
+  <select id="cases"></select>
+  <label><input type="checkbox" id="reset"> 运行前清空两侧状态</label>
+  <button id="run">运行对照</button>
+  <span class="muted">观察顺序影响：先选 R01（勾清空）→ 再选 R02（不勾清空）</span>
+</div>
+
+<h2>当前请求</h2>
+<div class="card" id="reqCard"><span class="muted">等待执行</span></div>
+
+<div class="grid">
+  <div>
+    <h2>修复前（原样机 challenge.py）</h2>
+    <div class="card base" id="baseCard"></div>
+  </div>
+  <div>
+    <h2>修复后（fixed_engine.py）</h2>
+    <div class="card fix" id="fixCard"></div>
+  </div>
+</div>
+
+<h2>差异摘要</h2>
+<div class="card" id="diffCard"><span class="muted">等待执行</span></div>
+
 <script>
-const el=document.getElementById('cases'),out=document.getElementById('out');
-fetch('/api/cases').then(r=>r.json()).then(d=>d.cases.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.id+' · '+c.request.doc_ids.join(',')+' / '+c.request.snapshot+' · '+c.request.query;el.append(o)})).catch(e=>out.textContent=String(e));
-document.getElementById('run').onclick=async()=>{try{const r=await fetch('/api/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({case_id:el.value,reset:document.getElementById('reset').checked})});out.textContent=JSON.stringify(await r.json(),null,2)}catch(e){out.textContent=String(e)}};
-</script></html>
+const $=id=>document.getElementById(id);
+const el=$('cases');
+
+function badge(text, cls){const s=document.createElement('span');s.className='badge '+cls;s.textContent=text;return s;}
+function line(label, value){const d=document.createElement('div');const b=document.createElement('b');b.textContent=label+'：';d.appendChild(b);d.appendChild(document.createTextNode(String(value)));return d;}
+function verifiedClass(locator, support){
+  if(locator==='valid' && support==='supported') return ['已核验','verified','b-ok'];
+  if(support==='insufficient') return ['已核验·不支持','unsupported','b-warn'];
+  if(support==='not_checked') return ['未核验','unverified','b-gray'];
+  return ['无效','invalid','b-bad'];
+}
+function renderCard(target, o, label){
+  target.textContent='';
+  const st=verifiedClass(o.locator_status,o.support_status);
+  target.classList.add(st[1]);
+  const h=document.createElement('div');h.appendChild(badge(st[0],st[2]));
+  h.appendChild(badge('locator: '+o.locator_status,'b-blue'));
+  h.appendChild(badge('support: '+o.support_status,o.support_status==='supported'?'b-ok':(o.support_status==='insufficient'?'b-warn':'b-gray')));
+  if(o.status!=='ok') h.appendChild(badge('status: '+o.status,'b-bad'));
+  if(o.cache_hit) h.appendChild(badge('cache_hit','b-warn'));
+  target.appendChild(h);
+
+  const tb=document.createElement('table');
+  const add=(k,v,cls)=>{const tr=document.createElement('tr');const th=document.createElement('th');th.textContent=k;const td=document.createElement('td');td.textContent=v;if(cls)td.className=cls;tr.appendChild(th);tr.appendChild(td);tb.appendChild(tr);};
+  add('答案', o.answer);
+  add('引用', (o.citations||[]).join(', ')||'（空）');
+  add('来源快照', (o.evidence||[]).length? o.evidence.map(e=>`${e.id} · ${e.doc_id} · ${e.snapshot} · 第${e.page}页`).join('\n') : '（无实际证据）');
+  add('实际证据', (o.evidence||[]).length? o.evidence.map(e=>`[${e.id}] ${e.text}`).join('\n---\n') : '（空）');
+  add('验证来源', (o.judgment_source||'-') + (o.support_basis? ' · 依据: '+o.support_basis : ''));
+  if(o.invalid_docs) add('未知文档', o.invalid_docs.join(', '));
+  add('运行标识', `request_id=${o.request_id} · ${o.run_kind} · ${o.elapsed_ms.toFixed(3)}ms`);
+  target.appendChild(tb);
+}
+
+fetch('/api/cases').then(r=>r.json()).then(d=>d.cases.forEach(c=>{
+  const o=document.createElement('option');o.value=c.id;
+  o.textContent=c.id+' · '+c.request.doc_ids.join(',')+' / '+c.request.snapshot+' · '+c.request.query;
+  el.append(o);
+})).catch(e=>$('reqCard').textContent=String(e));
+
+$('run').onclick=async()=>{
+  try{
+    const r=await fetch('/api/run_both',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({case_id:el.value,reset:$('reset').checked})});
+    const d=await r.json();
+    if(d.error){$('reqCard').textContent='错误: '+d.error;return;}
+
+    // 当前请求
+    $('reqCard').textContent='';
+    const rq=d.baseline.request;
+    $('reqCard').appendChild(line('case', d.case_id));
+    $('reqCard').appendChild(line('query', rq.query));
+    $('reqCard').appendChild(line('doc_ids', rq.doc_ids.join(', ')));
+    $('reqCard').appendChild(line('snapshot', rq.snapshot));
+    $('reqCard').appendChild(line('k', rq.k));
+
+    renderCard($('baseCard'), d.baseline, '修复前');
+    renderCard($('fixCard'), d.fixed, '修复后');
+
+    // 差异摘要：逐字段对比（request_id/elapsed/cache_hit 不参与正确性比较）
+    const skip=new Set(['request_id','elapsed_ms','cache_hit','request','support_basis','run_kind']);
+    const diffs=[];
+    const keys=new Set([...Object.keys(d.baseline),...Object.keys(d.fixed)]);
+    for(const k of keys){ if(skip.has(k)) continue;
+      const a=JSON.stringify(d.baseline[k]), b=JSON.stringify(d.fixed[k]);
+      if(a!==b) diffs.push(`【${k}】修复前=${a}\n【${k}】修复后=${b}`);
+    }
+    $('diffCard').textContent='';
+    if(!diffs.length){
+      const p=document.createElement('p');p.textContent='两侧输出逐字段一致（无差异）。';$('diffCard').appendChild(p);
+    }else{
+      const pre=document.createElement('pre');pre.textContent=diffs.join('\n\n');$('diffCard').appendChild(pre);
+      const s=document.createElement('p');s.className='muted';
+      s.textContent='（request_id / 耗时 / cache_hit 为运行标识字段，不参与行为比较；support_basis 为修复版新增披露字段）';
+      $('diffCard').appendChild(s);
+    }
+  }catch(e){$('reqCard').textContent=String(e);}
+};
+</script>
+</body>
+</html>

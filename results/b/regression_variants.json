@@ -1,0 +1,42 @@
+{
+  "predictions": "\n【预测（先于运行写下）】\nV1 顺序变体：corpus 全序反转后重跑 7 案 → fixed 输出与 baseline 修复版逐字段一致\n   （排序键含 id 字典序与分数，输入顺序不应影响结果）。\nV2 标识变体：doc_id 与快照名做保结构映射（alpha→gamma, beta→delta, v1→s1, v2→s2,\n   b0x→c0x，全部同步改 request/draft/corpus）→ fixed 输出结构与状态与原版逐字段一致\n   （实现只按标识等值比较，不依赖具体字符串）。\nB1 自构造边界：answers 引用不存在 id（draft.citations=['ghost']）且答案含无出处数值 →\n   fixed: locator=missing, support=not_checked（不越界、不编造 supported）。\n",
+  "checks": {
+    "regression_R01_R05_R06": "PASS",
+    "V1_corpus_order": "PASS",
+    "V2_id_remap": "PASS",
+    "B1_ghost_citation": "PASS"
+  },
+  "B1_output": {
+    "status": "ok",
+    "answer": "指标为42。",
+    "citations": [
+      "ghost"
+    ],
+    "evidence": [
+      {
+        "id": "b05",
+        "doc_id": "beta",
+        "snapshot": "v1",
+        "page": 3,
+        "text": "本页说明数据文档编号为beta，可使用本页定位元数据。",
+        "tags": [
+          "metadata",
+          "beta"
+        ]
+      }
+    ],
+    "locator_status": "missing",
+    "support_status": "not_checked",
+    "judgment_source": "rule",
+    "request": {
+      "query": "metadata beta",
+      "doc_ids": [
+        "beta"
+      ],
+      "snapshot": "v1",
+      "k": 2
+    },
+    "run_kind": "offline_replay"
+  },
+  "baseline_V1_same_output_as_original": true
+}
